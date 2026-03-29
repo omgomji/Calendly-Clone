@@ -1,0 +1,167 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary: #006bff;
+    --background: #ffffff;
+    --surface: #ffffff;
+    --on-background: #1a1a1a;
+    --on-surface: #1a1a1a;
+    --on-surface-variant: #6b7280;
+    --border: #e2e8f0;
+    --surface-tint: #f9fafb;
+    --error: #df1b1b;
+    --text-xs: 12px;
+    --text-sm: 14px;
+    --text-md: 16px;
+    --text-lg: 20px;
+    --text-xl: 28px;
+    --active-bg: #f2f8ff;
+  }
+
+  :root.dark {
+    --primary: #3b82f6; /* slightly lighter blue for dark mode contrast */
+    --background: #0f172a;
+    --surface: #1e293b;
+    --on-background: #ffffff;
+    --on-surface: #f8fafc;
+    --on-surface-variant: #94a3b8;
+    --border: #334155;
+    --surface-tint: #0f172a;
+    --active-bg: #1e293b;
+
+    /* Magic inversion of Tailwind v4 core colors used extensively in our components */
+    --color-white: #0f172a;
+    --color-black: #ffffff;
+    --color-slate-50: #1e293b;
+    --color-slate-100: #334155;
+    --color-slate-200: #475569;
+    --color-slate-300: #64748b;
+    --color-slate-400: #94a3b8;
+    --color-slate-500: #cbd5e1;
+    --color-slate-600: #e2e8f0;
+    --color-slate-700: #f1f5f9;
+    --color-slate-800: #f8fafc;
+    --color-slate-900: #ffffff;
+  }
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-on-background: var(--on-background);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-border: var(--border);
+  --color-surface-tint: var(--surface-tint);
+  --color-error: var(--error);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--on-background);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Shared UI system matching Scheduling look */
+.cal-ui-shell {
+  font-size: var(--text-sm);
+  color: var(--color-slate-900);
+}
+
+.cal-ui-shell h1,
+.cal-ui-shell .cal-page-title {
+  font-size: var(--text-xl) !important;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--color-slate-900);
+}
+
+.cal-ui-shell h2,
+.cal-ui-shell .cal-section-title {
+  font-size: var(--text-lg) !important;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--color-slate-900);
+}
+
+.cal-ui-shell h3 {
+  font-size: var(--text-md) !important;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--color-slate-900);
+}
+
+.cal-ui-shell p,
+.cal-ui-shell label,
+.cal-ui-shell input,
+.cal-ui-shell select,
+.cal-ui-shell textarea,
+.cal-ui-shell button {
+  letter-spacing: 0;
+}
+
+/* Normalize older tiny text utilities to Scheduling scale */
+.cal-ui-shell .text-\[10px\] { font-size: 12px !important; }
+.cal-ui-shell .text-\[11px\] { font-size: 13px !important; }
+.cal-ui-shell .text-\[12px\] { font-size: 14px !important; }
+.cal-ui-shell .text-\[13px\] { font-size: 14px !important; }
+.cal-ui-shell .text-\[20px\] { font-size: 28px !important; }
+
+/* Keep compact badges/chips from becoming oversized */
+.cal-ui-shell .inline-flex.text-\[10px\],
+.cal-ui-shell .inline-flex.text-\[11px\],
+.cal-ui-shell .inline-flex.text-\[12px\] {
+  line-height: 1;
+}
+
+/* Custom Utilities for CalClo Look */
+.sidebar-item-active {
+  background-color: var(--active-bg);
+  color: var(--primary);
+  border-right: 4px solid var(--primary);
+}
+
+.calclo-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-slate-200);
+  border-radius: 8px;
+  transition: box-shadow 0.2s;
+}
+
+.calclo-card:hover {
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.08);
+}
+
+.calclo-button-primary {
+  background-color: var(--primary);
+  color: var(--color-white);
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calclo-button-primary:hover {
+  background-color: var(--primary);
+  opacity: 0.9;
+}
+
+.calclo-button-secondary {
+  background-color: var(--color-white);
+  color: var(--color-slate-900);
+  border: 1px solid var(--color-slate-900);
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 9999px;
+}
+
+.calclo-pill {
+    @apply px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider;
+}

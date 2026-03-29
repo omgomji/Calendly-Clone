@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// The host/admin who owns event types and availability.
+/// Even though auth is out of scope, a users table is the root entity
+/// that owns *everything* — event types, schedules, and bookings.
+model User {
+  id                   Int                   @id @default(autoincrement())
+  username             String                @unique
+  name                 String
+  email                String                @unique
+  timezone             String                @default("Asia/Kolkata")
+  availabilitySchedule AvailabilitySchedule?
+  bookings             Booking[]
+  contacts             Contact[]
+  eventTypes           EventType[]
+}
+
+/// A bookable meeting template (e.g. "30 Min Interview").
+/// Each event type generates a unique public booking link: /:username/:slug
+model EventType {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  title       String
+  slug        String
+  duration    Int
+  description String?
+  isActive    Boolean   @default(true)
+  bookings    Booking[]
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, slug])
+}
+
+/// Per-user schedule container. Holds the host's timezone and groups
+/// the individual day rules. One schedule per user (MVP).
+model AvailabilitySchedule {
+  id                       Int               @id @default(autoincrement())
+  userId                   Int               @unique
+  timezone                 String
+  beforeEventBufferMinutes Int               @default(0)
+  afterEventBufferMinutes  Int               @default(0)
+  startTimeIncrementMinutes Int              @default(30)
+  minimumNoticeMinutes      Int              @default(0)
+  maximumDaysInFuture       Int              @default(60)
+  allowBackToBack           Boolean          @default(true)
+  days                     AvailabilityDay[]
+  dateOverrides            AvailabilityDateOverride[]
+  user                     User              @relation(fields: [userId], references: [id])
+}
+
+/// Individual day-level availability rule (e.g. "Monday 09:00–17:00").
+/// Times are LOCAL to the schedule's timezone — not UTC.
+/// This preserves human intent across DST transitions.
+model AvailabilityDay {
+  id         Int                  @id @default(autoincrement())
+  scheduleId Int
+  dayOfWeek  Int
+  intervals  AvailabilityInterval[]
+  schedule   AvailabilitySchedule @relation(fields: [scheduleId], references: [id])
+
+  @@unique([scheduleId, dayOfWeek])
+}
+
+/// Time intervals for a given weekday rule.
+/// Example for Monday: [09:00-12:00, 13:00-17:00].
+model AvailabilityInterval {
+  id        Int             @id @default(autoincrement())
+  dayId     Int
+  startTime String
+  endTime   String
+  order     Int
+  day       AvailabilityDay @relation(fields: [dayId], references: [id])
+
+  @@unique([dayId, order])
+  @@index([dayId, startTime, endTime])
+}
+
+/// Date-specific availability rules that override weekly day rules.
+/// Example: 2026-12-25 can be marked unavailable or custom hours.
+model AvailabilityDateOverride {
+  id        Int                               @id @default(autoincrement())
+  scheduleId Int
+  date      DateTime                          @db.Date
+  intervals AvailabilityDateOverrideInterval[]
+  schedule  AvailabilitySchedule              @relation(fields: [scheduleId], references: [id])
+
+  @@unique([scheduleId, date])
+  @@index([scheduleId, date])
+}
+
+/// Time intervals for a date-specific override.
+/// Empty interval list means the date is explicitly unavailable.
+model AvailabilityDateOverrideInterval {
+  id         Int                      @id @default(autoincrement())
+  overrideId Int
+  startTime  String
+  endTime    String
+  order      Int
+  override   AvailabilityDateOverride @relation(fields: [overrideId], references: [id])
+
+  @@unique([overrideId, order])
+  @@index([overrideId, startTime, endTime])
+}
+
+/// A confirmed (or cancelled) meeting between a host and an invitee.
+///
+/// userId is denormalised from eventType.userId for two reasons:
+/// 1. The PostgreSQL exclusion constraint (no_overlapping_bookings) needs
+/// userId as a local column — it cannot reference columns in other tables.
+/// 2. Every major query (upcoming meetings, overlap check) filters by userId.
+/// Having it local eliminates the JOIN for filtering.
+///
+/// userId is immutable after creation — no update anomaly risk.
+/// See schema_fixes.md for the full justification.
+model Booking {
+  id           Int           @id @default(autoincrement())
+  uid          String        @unique @default(uuid())
+  eventTypeId  Int
+  userId       Int
+  inviteeName  String
+  inviteeEmail String
+  startTime    DateTime
+  endTime      DateTime
+  status       BookingStatus @default(SCHEDULED)
+  createdAt    DateTime      @default(now())
+  eventType    EventType     @relation(fields: [eventTypeId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+
+  @@index([userId, status, startTime, endTime])
+  @@index([userId, startTime])
+  @@index([startTime])
+}
+
+/// A CRM-style person record for the host's admin workspace.
+/// Used by Contacts page for storing invitees and manual entries.
+model Contact {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  email     String
+  phone     String?
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, email])
+  @@index([userId, createdAt])
+}
+
+enum BookingStatus {
+  SCHEDULED
+  CANCELLED
+}
