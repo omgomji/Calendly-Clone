@@ -1,0 +1,42 @@
+VERCEL DEPLOYMENT - QUICK CHECKLIST
+====================================
+
+PROBLEM: Still seeing 404 errors on frontend
+
+SOLUTION: Set environment variable in Vercel and redeploy
+
+STEP-BY-STEP:
+
+1. ☐ Open https://vercel.com/dashboard
+2. ☐ Click "calendly-clone" project
+3. ☐ Click "Settings" tab (top navigation)
+4. ☐ Click "Environment Variables" in left sidebar
+5. ☐ Click "Add New" button
+6. ☐ Fill in form:
+     Name: NEXT_PUBLIC_API_URL
+     Value: https://calendly-clone-heqv.onrender.com/api
+7. ☐ Check boxes for: Production, Preview, Development
+8. ☐ Click "Save" button
+9. ☐ Go to "Deployments" tab
+10. ☐ Find the latest deployment (top of list)
+11. ☐ Click the ⋮ (three dots) on the right side
+12. ☐ Click "Redeploy"
+13. ☐ Wait for ✅ green checkmark next to deployment
+14. ☐ Open your frontend URL in browser
+15. ☐ Press F12 to open Developer Console
+16. ☐ Go to "Network" tab
+17. ☐ Refresh page (F5)
+18. ☐ Look for API requests - verify they go to:
+     https://calendly-clone-heqv.onrender.com/api/...
+
+If still seeing 404:
+- Hard refresh: Ctrl+Shift+Delete (clear cache) then Ctrl+F5
+- Verify NEXT_PUBLIC_API_URL is actually saved in Vercel Settings
+- Check Network tab to see actual URL being requested
+
+BACKEND STATUS: ✅ Working
+  URL: https://calendly-clone-heqv.onrender.com
+  Health: {"status":"ok"}
+  Database: Seeded with sample data
+  
+NEXT: Follow all 18 steps above, then let me know if still seeing 404
