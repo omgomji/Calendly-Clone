@@ -36,9 +36,10 @@ Set the `NEXT_PUBLIC_API_URL` environment variable in Vercel to point to your Re
 - You should see the admin dashboard load
 - Check browser console (F12) for any errors
 
-## Example Values
-- Render Backend URL: `https://calendly-backend-abcd1234.onrender.com`
-- NEXT_PUBLIC_API_URL: `https://calendly-backend-abcd1234.onrender.com/api`
+## Your Values
+- Render Backend URL: `https://calendly-clone-heqv.onrender.com`
+- NEXT_PUBLIC_API_URL: `https://calendly-clone-heqv.onrender.com/api`
+- Backend Status: ✅ Verified working (health check passed)
 
 ## Troubleshooting
 - If still 404: Check that NEXT_PUBLIC_API_URL exactly matches your Render URL + `/api`
