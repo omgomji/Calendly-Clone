@@ -2,27 +2,29 @@
 
 import { useEffect, useState } from 'react';
 
-const HEALTH_URL = process.env.NEXT_PUBLIC_API_URL
-  ? `${process.env.NEXT_PUBLIC_API_URL}/health`
-  : 'http://localhost:5000/api/health';
+const HEALTH_URL = (() => {
+  const base = process.env.NEXT_PUBLIC_API_URL;
+  if (base) return `${base}/health`;
+  return 'http://localhost:5000/api/health';
+})();
 
-// How long (ms) before we consider the backend "slow" and show the banner
-const SLOW_THRESHOLD_MS = 2500;
-// How often to retry while waking up (ms)
 const RETRY_INTERVAL_MS = 4000;
 
-type BannerState = 'idle' | 'waking' | 'ready';
+type BannerState = 'waking' | 'ready';
 
 export default function RenderWakeupBanner() {
-  const [state, setState] = useState<BannerState>('idle');
+  const [state, setState] = useState<BannerState>('waking');
   const [elapsedSec, setElapsedSec] = useState(0);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    let retryTimer: ReturnType<typeof setTimeout>;
-    let ticker: ReturnType<typeof setInterval>;
-    let startTime: number;
     let cancelled = false;
+    let retryTimer: ReturnType<typeof setTimeout>;
+
+    // Tick every second to show elapsed time
+    const ticker = setInterval(() => {
+      setElapsedSec((s) => s + 1);
+    }, 1000);
 
     async function ping() {
       try {
@@ -30,67 +32,31 @@ export default function RenderWakeupBanner() {
         if (!cancelled && res.ok) {
           clearInterval(ticker);
           setState('ready');
-          // Auto-dismiss the "ready" flash after 3s
+          // Auto-dismiss the success flash after 3s
           setTimeout(() => {
             if (!cancelled) setDismissed(true);
           }, 3000);
-        } else {
-          schedule();
+          return;
         }
       } catch {
-        schedule();
+        // still sleeping — retry
       }
-    }
-
-    function schedule() {
       if (!cancelled) {
         retryTimer = setTimeout(ping, RETRY_INTERVAL_MS);
       }
     }
 
-    async function start() {
-      startTime = Date.now();
-
-      // First quick attempt immediately
-      try {
-        const res = await fetch(HEALTH_URL, { cache: 'no-store' });
-        if (!cancelled && res.ok) {
-          // Backend was fast — never show the banner
-          return;
-        }
-      } catch {
-        // Backend is sleeping — fall through
-      }
-
-      const elapsed = Date.now() - startTime;
-      if (elapsed < SLOW_THRESHOLD_MS) {
-        // Wait a bit more before declaring it slow
-        await new Promise((r) => setTimeout(r, SLOW_THRESHOLD_MS - elapsed));
-      }
-
-      if (cancelled) return;
-
-      // Backend is definitely slow — show the banner
-      setState('waking');
-      setElapsedSec(0);
-
-      ticker = setInterval(() => {
-        setElapsedSec((s) => s + 1);
-      }, 1000);
-
-      schedule();
-    }
-
-    start();
+    // Start pinging immediately
+    ping();
 
     return () => {
       cancelled = true;
-      clearTimeout(retryTimer);
       clearInterval(ticker);
+      clearTimeout(retryTimer);
     };
   }, []);
 
-  if (dismissed || state === 'idle') return null;
+  if (dismissed) return null;
 
   const isReady = state === 'ready';
 
@@ -142,7 +108,6 @@ export default function RenderWakeupBanner() {
         </>
       ) : (
         <>
-          {/* Spinner */}
           <span
             style={{
               width: '18px',
