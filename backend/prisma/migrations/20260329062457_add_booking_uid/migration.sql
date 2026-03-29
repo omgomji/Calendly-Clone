@@ -19,6 +19,3 @@ ALTER TABLE "User" ALTER COLUMN "timezone" SET DEFAULT 'Asia/Kolkata';
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Booking_uid_key" ON "Booking"("uid");
-
--- RenameIndex
-ALTER INDEX "AvailabilityDateOverrideInterval_overrideId_startTime_endTime_i" RENAME TO "AvailabilityDateOverrideInterval_overrideId_startTime_endTi_idx";
