@@ -70,6 +70,7 @@ A full-stack scheduling and booking web application that replicates Calendly's d
 - [API Endpoints](#-api-endpoints)
 - [Project Structure](#-project-structure)
 - [Testing](#-testing-the-application)
+- [Assumptions](#-assumptions-made)
 - [Deployment](#-deployment)
 
 ---
@@ -81,7 +82,7 @@ A full-stack scheduling and booking web application that replicates Calendly's d
 | **Frontend** | Next.js (App Router), React, TypeScript, Tailwind CSS | 16, 19, TS 5+, v4 |
 | **Backend** | Node.js, Express, TypeScript | Express 5, TS 5+ |
 | **Database** | PostgreSQL + Prisma ORM | PG 14+, Prisma 5 |
-| **Hosting** | Vercel (frontend) · Render (backend) · Supabase (database) | — |
+| **Hosting** | Vercel (frontend) · Render (backend) · [Neon](https://neon.tech) (database) | — |
 | **Key Libraries** | Axios, date-fns, date-fns-tz, Lucide Icons | — |
 
 ---
@@ -445,6 +446,25 @@ Both commands should complete with **zero errors**.
 
 ---
 
+## 📌 Assumptions Made
+
+The following assumptions were made during development, as guided by the assignment brief:
+
+| # | Assumption | Rationale |
+|---|-----------|----------|
+| 1 | **Single default user is always logged in** | The assignment states *"Assume a default user is logged in"* — so no login/signup flow was built. A mock auth middleware resolves the user from the database. |
+| 2 | **No email/calendar integrations** | Booking confirmations, reminders, and calendar invites (Google Calendar, Outlook) are out of scope. The confirmation page serves as the receipt. |
+| 3 | **Google Meet links are placeholders** | Event types display "Google Meet" as the location, but no actual Meet link generation occurs (requires Google OAuth integration). |
+| 4 | **Host timezone is set at seed time** | The seeded user's timezone (`Asia/Kolkata`) is configured during database seeding. There is no UI to change the user's profile timezone (availability timezone *can* be changed). |
+| 5 | **All event types are One-on-One** | Group events and round-robin assignment are not implemented. The system assumes each booking is between one host and one invitee. |
+| 6 | **Invitees are anonymous** | Anyone with the public link can book — there is no invitee authentication or login requirement. |
+| 7 | **No payment integration** | Paid events / Stripe checkout are not implemented. All bookings are free. |
+| 8 | **Browser modern-only** | The frontend uses modern CSS (Tailwind v4, CSS nesting) and ES2020+ features. No IE11 or legacy browser support. |
+| 9 | **Local development uses PostgreSQL** | A local PostgreSQL instance (14+) with `btree_gist` extension support is required. The `EXCLUDE USING gist` constraint won't work on SQLite or MySQL. |
+| 10 | **Seeded data represents a realistic state** | The seed script creates a user, event types, availability rules, sample bookings, and contacts so reviewers can immediately explore all features without manual setup. |
+
+---
+
 ## 🚢 Deployment
 
 The application is deployed using:
@@ -453,7 +473,7 @@ The application is deployed using:
 |---------|------|-----|
 | **Vercel** | Frontend hosting (Next.js) | [calendly-clone-psi-eight.vercel.app](https://calendly-clone-psi-eight.vercel.app/) |
 | **Render** | Backend hosting (Express API) | Free-tier web service |
-| **Supabase** | PostgreSQL database | Managed cloud Postgres |
+| **[Neon](https://neon.tech)** | PostgreSQL database | Serverless Postgres |
 
 ### Environment Variables
 
@@ -464,7 +484,7 @@ NEXT_PUBLIC_API_URL=https://<your-render-url>/api
 
 **Backend (Render):**
 ```env
-DATABASE_URL=postgresql://<supabase-connection-string>
+DATABASE_URL=postgresql://<neon-connection-string>
 PORT=5000
 ```
 
