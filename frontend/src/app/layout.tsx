@@ -5,6 +5,7 @@ import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 import { ThemeProvider } from '@/components/ThemeProvider';
+import RenderWakeupBanner from '@/components/RenderWakeupBanner';
 
 export const metadata: Metadata = {
   title: 'CalClo Clone',
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <ThemeProvider>
           {children}
+          <RenderWakeupBanner />
         </ThemeProvider>
       </body>
     </html>
