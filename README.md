@@ -1,8 +1,76 @@
-# 📅 CalClo Clone — Scheduling Platform
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/Express-5-000000?style=for-the-badge&logo=express" alt="Express" />
+  <img src="https://img.shields.io/badge/TypeScript-5+-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PostgreSQL-14+-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Prisma-5-2D3748?style=for-the-badge&logo=prisma" alt="Prisma" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+</p>
 
-A full-stack scheduling/booking web application that replicates CalClo's design, user experience, and core functionality. Users can create event types, configure their availability, and share public booking pages where invitees can schedule meetings.
+# 📅 CalClo — Scheduling Platform
+
+A full-stack scheduling and booking web application that replicates Calendly's design, user experience, and core functionality. Users can create event types, configure their availability, and share public booking pages where invitees can schedule meetings.
 
 > **SDE Intern Fullstack Assignment** — Built with a strictly separated frontend + backend architecture.
+
+---
+
+## 🔗 Live Demo
+
+| | Link | Description |
+|---|---|---|
+| 🖥️ **Dashboard** | [calendly-clone-psi-eight.vercel.app](https://calendly-clone-psi-eight.vercel.app/) | Admin dashboard — manage event types, meetings, availability |
+| 📆 **Public Booking** | [calendly-clone-psi-eight.vercel.app/om](https://calendly-clone-psi-eight.vercel.app/om) | Public-facing booking page for user **OM** |
+| 📋 **Meetings** | [calendly-clone-psi-eight.vercel.app/meetings](https://calendly-clone-psi-eight.vercel.app/meetings) | View upcoming/past meetings, cancel & reschedule |
+| ⏰ **Availability** | [calendly-clone-psi-eight.vercel.app/availability](https://calendly-clone-psi-eight.vercel.app/availability) | Configure weekly hours, date overrides, buffer times |
+| 👥 **Contacts** | [calendly-clone-psi-eight.vercel.app/contacts](https://calendly-clone-psi-eight.vercel.app/contacts) | Contacts / CRM management |
+
+> [!NOTE]
+> The backend is hosted on Render's free tier and may take **~30 seconds** to wake up on first visit. A toast notification will appear while the server spins up.
+
+---
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="./screenshots/dashboard.png" alt="Scheduling Dashboard" width="800" />
+  <br><em>Scheduling Dashboard — Event type management with search, CRUD, and bulk operations</em>
+</p>
+
+<p align="center">
+  <img src="./screenshots/public-booking.png" alt="Public Booking Page" width="800" />
+  <br><em>Public Booking Page — Invitees select an event type to schedule</em>
+</p>
+
+<p align="center">
+  <img src="./screenshots/meetings.png" alt="Meetings Dashboard" width="800" />
+  <br><em>Meetings Dashboard — Tabbed view with reschedule, cancel, export, and date filtering</em>
+</p>
+
+<p align="center">
+  <img src="./screenshots/availability.png" alt="Availability Settings" width="800" />
+  <br><em>Availability Settings — Weekly hours, timezone selection, and copy-to-days</em>
+</p>
+
+---
+
+## 📑 Table of Contents
+
+- [Live Demo](#-live-demo)
+- [Screenshots](#-screenshots)
+- [Tech Stack](#-tech-stack)
+- [Features](#-features-implemented)
+- [Architecture](#-architecture)
+- [Design Decisions](#-design-decisions--trade-offs)
+- [Known Limitations](#️-known-limitations)
+- [Prerequisites](#-prerequisites)
+- [Setup Instructions](#-setup-instructions)
+- [Seeded Data](#-seeded-data)
+- [API Endpoints](#-api-endpoints)
+- [Project Structure](#-project-structure)
+- [Testing](#-testing-the-application)
+- [Deployment](#-deployment)
 
 ---
 
@@ -13,13 +81,12 @@ A full-stack scheduling/booking web application that replicates CalClo's design,
 | **Frontend** | Next.js (App Router), React, TypeScript, Tailwind CSS | 16, 19, TS 5+, v4 |
 | **Backend** | Node.js, Express, TypeScript | Express 5, TS 5+ |
 | **Database** | PostgreSQL + Prisma ORM | PG 14+, Prisma 5 |
+| **Hosting** | Vercel (frontend) · Render (backend) · Supabase (database) | — |
 | **Key Libraries** | Axios, date-fns, date-fns-tz, Lucide Icons | — |
 
 ---
 
 ## ✅ Features Implemented
-
-### Must Have (All Complete)
 
 | # | Feature | Highlights |
 |---|---------|------------|
@@ -29,11 +96,6 @@ A full-stack scheduling/booking web application that replicates CalClo's design,
 | 4 | **Meetings Dashboard** | Tabbed view (Upcoming/Past/Date Range), dual-month date picker with presets, cancel/reschedule actions, CSV export |
 | 5 | **Database Design** | Normalized PostgreSQL schema (10 models), composite indexes, DB-level exclusion constraint for double-booking prevention |
 | 6 | **REST API** | Clean layered architecture (Routes → Controllers → Services → Prisma), typed error classes, global error handler |
-
-### Good to Have (Bonus Features)
-
-| # | Feature | Details |
-|---|---------|---------|
 | 7 | **Rescheduling** | Secure UID-based flow; atomically soft-cancels old booking + creates new one in a single DB transaction |
 | 8 | **Buffer Times** | Configurable before/after event buffers respected in both slot generation and conflict checks |
 | 9 | **Date Overrides** | Override weekly rules for specific dates (holidays, custom hours); empty intervals = fully unavailable |
@@ -140,7 +202,7 @@ Request A ──┐                    Request B ──┐
 ## ⚠️ Known Limitations
 
 | Limitation | Impact | Mitigation |
-|-----------|--------|-----------|
+|-----------|--------|------------|
 | **No email notifications** | Invitees don't receive booking confirmations via email | Confirmation page displays all details; a Nodemailer/Resend integration would be needed for production |
 | **Mock authentication** | No real user management or multi-user support | By design per assignment spec; the `adminAuth` middleware is a single-file swap to integrate JWT |
 | **No WebSocket real-time updates** | If two browsers view the same calendar, stale slots aren't pushed | The frontend uses 15-second polling + visibility/focus event refetching as a practical alternative |
@@ -162,8 +224,8 @@ Request A ──┐                    Request B ──┐
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd CalClo-Clone
+git clone https://github.com/omgomji/Calendly-Clone.git
+cd Calendly-Clone
 ```
 
 ### 2. Backend Setup
@@ -193,7 +255,8 @@ npx ts-node prisma/setup-constraints.ts
 npx prisma db seed
 ```
 
-> **⚠️ Important:** The `setup-constraints.ts` step is critical — it creates a PostgreSQL exclusion constraint (`EXCLUDE USING gist`) that prevents overlapping bookings at the database level. This requires the `btree_gist` extension, which is auto-enabled by the script.
+> [!WARNING]
+> The `setup-constraints.ts` step is critical — it creates a PostgreSQL exclusion constraint (`EXCLUDE USING gist`) that prevents overlapping bookings at the database level. This requires the `btree_gist` extension, which is auto-enabled by the script.
 
 Start the backend dev server:
 
@@ -230,7 +293,7 @@ Visit `http://localhost:3000` to see the admin dashboard.
 |------|--------|
 | **1** | Open `http://localhost:3000` — the **Event Types** dashboard loads |
 | **2** | Click **"View booking page"** on any event card to open the public booking link |
-| **3** | Or navigate directly to `http://localhost:3000/om/15-min-chat` (seeded username = `admin`) |
+| **3** | Or navigate directly to `http://localhost:3000/om/15-min-chat` (seeded username = `om`) |
 | **4** | Select a date → pick a time slot → fill in name + email → submit |
 | **5** | See the **confirmation page** with meeting details |
 | **6** | Go to the **Meetings** tab (`http://localhost:3000/meetings`) to view/cancel/reschedule |
@@ -253,6 +316,8 @@ The database seed (`npx prisma db seed`) creates:
 ---
 
 ## 📡 API Endpoints
+
+**Base URL (local):** `http://localhost:5000/api`
 
 ### Admin Routes (Protected — mock auth)
 
@@ -288,7 +353,7 @@ The database seed (`npx prisma db seed`) creates:
 ## 📁 Project Structure
 
 ```
-CalClo-Clone/
+Calendly-Clone/
 ├── backend/
 │   ├── prisma/
 │   │   ├── schema.prisma            # Database schema (10 models, indexes, constraints)
@@ -344,6 +409,7 @@ CalClo-Clone/
 │   ├── next.config.ts
 │   └── package.json
 │
+├── screenshots/                          # App screenshots for README
 ├── .gitignore
 └── README.md
 ```
@@ -376,3 +442,43 @@ cd frontend && npm run build
 ```
 
 Both commands should complete with **zero errors**.
+
+---
+
+## 🚢 Deployment
+
+The application is deployed using:
+
+| Service | Role | URL |
+|---------|------|-----|
+| **Vercel** | Frontend hosting (Next.js) | [calendly-clone-psi-eight.vercel.app](https://calendly-clone-psi-eight.vercel.app/) |
+| **Render** | Backend hosting (Express API) | Free-tier web service |
+| **Supabase** | PostgreSQL database | Managed cloud Postgres |
+
+### Environment Variables
+
+**Frontend (Vercel):**
+```env
+NEXT_PUBLIC_API_URL=https://<your-render-url>/api
+```
+
+**Backend (Render):**
+```env
+DATABASE_URL=postgresql://<supabase-connection-string>
+PORT=5000
+```
+
+---
+
+## 🙏 Acknowledgements
+
+- [Calendly](https://calendly.com) — for the UI/UX inspiration
+- [Next.js](https://nextjs.org) · [Express](https://expressjs.com) · [Prisma](https://prisma.io) · [PostgreSQL](https://postgresql.org) — the incredible open-source stack
+- [Lucide Icons](https://lucide.dev) — beautiful open-source icon set
+- [date-fns](https://date-fns.org) — modern JavaScript date utility library
+
+---
+
+<p align="center">
+  Made with ❤️ by <strong>OM</strong>
+</p>
